@@ -1,0 +1,28 @@
+name: Temporary Q4892 exact search
+
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/q4892-run.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  run:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 30
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install sympy
+      - name: Fetch and run Q4892 verifier
+        run: |
+          curl --fail --location https://raw.githubusercontent.com/xiangyazi24/Shen_work/q4892-single-sum/scratch/q4892_quick.py -o q4892_quick.py
+          python q4892_quick.py | tee q4892_result.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q4892-result
+          path: q4892_result.txt
